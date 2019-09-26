@@ -106,8 +106,8 @@ void Cube::draw()
 
 void Cube::update()
 {
-	// Spin the cube by 1 degree.
-	spin(1.f);
+	// Spin the cube by 0.1 degree.
+	spin(0.1f);
 }
 
 void Cube::spin(float deg)

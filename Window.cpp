@@ -106,8 +106,8 @@ GLFWwindow* Window::createWindow(int width, int height)
 	}
 #endif
 
-	// Set swap interval to 1.
-	glfwSwapInterval(1);
+	// Set swap interval to 0.
+	glfwSwapInterval(0);
 
 	// Call the resize callback to make sure things get drawn immediately.
 	Window::resizeCallback(window, width, height);
