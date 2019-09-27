@@ -5,7 +5,12 @@ int Window::height;
 
 const char* Window::windowTitle = "GLFW Starter Project";
 
+// Objects to display.
 Cube * Window::cube;
+PointCloud * Window::cubePoints;
+
+// The object currently displaying.
+Object * Window::currentObj; 
 
 glm::mat4 Window::projection; // Projection matrix.
 
@@ -23,8 +28,7 @@ GLuint Window::viewLoc; // Location of view in shader.
 GLuint Window::modelLoc; // Location of model in shader.
 GLuint Window::colorLoc; // Location of color in shader.
 
-bool Window::initializeObjects()
-{
+bool Window::initializeProgram() {
 	// Create a shader program with a vertex shader and a fragment shader.
 	program = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
 
@@ -43,16 +47,28 @@ bool Window::initializeObjects()
 	modelLoc = glGetUniformLocation(program, "model");
 	colorLoc = glGetUniformLocation(program, "color");
 
+	return true;
+}
+
+bool Window::initializeObjects()
+{
 	// Create a cube of size 5.
 	cube = new Cube(5.0f);
+	// Create a point cloud consisting of cube vertices.
+	cubePoints = new PointCloud("foo", width, height, 100);
+
+	// Set cube to be the first to display
+	currentObj = cube;
 
 	return true;
 }
 
 void Window::cleanUp()
 {
-	// Deallcoate the cube.
+	// Deallcoate the objects.
 	delete cube;
+	delete cubePoints;
+
 	// Delete the shader program.
 	glDeleteProgram(program);
 }
@@ -106,7 +122,7 @@ GLFWwindow* Window::createWindow(int width, int height)
 	}
 #endif
 
-	// Set swap interval to 0.
+	// Set swap interval to 1.
 	glfwSwapInterval(0);
 
 	// Call the resize callback to make sure things get drawn immediately.
@@ -133,8 +149,8 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 
 void Window::idleCallback()
 {
-	// Perform any updates as necessary. Here, we will spin the cube slightly.
-	cube->update();
+	// Perform any updates as necessary. 
+	currentObj->update();
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -143,15 +159,15 @@ void Window::displayCallback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
 	// Specify the values of the uniform variables we are going to use.
-	glm::mat4 model = cube->getModel();
-	glm::vec3 color = cube->getColor();
+	glm::mat4 model = currentObj->getModel();
+	glm::vec3 color = currentObj->getColor();
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
-	// Render objects.
-	cube->draw();
+	// Render the object.
+	currentObj->draw();
 
 	// Gets events, including input such as keyboard and mouse or window resizing.
 	glfwPollEvents();
@@ -161,14 +177,29 @@ void Window::displayCallback(GLFWwindow* window)
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	/*
+	 * TODO: Modify below to add your key callbacks.
+	 */
+	
 	// Check for a key press.
 	if (action == GLFW_PRESS)
 	{
-		// Check if escape was pressed.
-		if (key == GLFW_KEY_ESCAPE)
+		switch (key)
 		{
+		case GLFW_KEY_ESCAPE:
 			// Close the window. This causes the program to also terminate.
-			glfwSetWindowShouldClose(window, GL_TRUE);
+			glfwSetWindowShouldClose(window, GL_TRUE);				
+			break;
+		case GLFW_KEY_1:
+			// Set currentObj to cube
+			currentObj = cube;
+			break;
+		case GLFW_KEY_2:
+			// Set currentObj to cubePoints
+			currentObj = cubePoints;
+			break;
+		default:
+			break;
 		}
 	}
 }

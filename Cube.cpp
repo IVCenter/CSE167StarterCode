@@ -68,7 +68,7 @@ Cube::Cube(float size)
 	glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
 	// Pass in the data.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), 
-		&vertices[0], GL_STATIC_DRAW);
+		vertices.data(), GL_STATIC_DRAW);
 	// Enable vertex attribute 0. 
 	// We will be able to access vertices through it.
 	glEnableVertexAttribArray(0);
@@ -78,7 +78,7 @@ Cube::Cube(float size)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbos[1]);
 	// Pass in the data.
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::ivec3) * indices.size(), 
-		&indices[0], GL_STATIC_DRAW);
+		indices.data(), GL_STATIC_DRAW);
 
 	// Unbind from the VBOs.
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -106,7 +106,7 @@ void Cube::draw()
 
 void Cube::update()
 {
-	// Spin the cube by 0.1 degree.
+	// Spin the cube by 1 degree.
 	spin(0.1f);
 }
 
