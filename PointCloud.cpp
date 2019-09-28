@@ -1,7 +1,7 @@
 #include "PointCloud.h"
 
-PointCloud::PointCloud(std::string objFilename, float width, float height, 
-	GLfloat pointSize): pointSize(pointSize)
+PointCloud::PointCloud(std::string objFilename, GLfloat pointSize) 
+	: pointSize(pointSize)
 {
 	/* 
 	 * TODO: Section 2: Currently, all the points are hard coded below. 
@@ -21,7 +21,7 @@ PointCloud::PointCloud(std::string objFilename, float width, float height,
 
 	/*
 	 * TODO: Section 4, you will need to normalize the object to fit in the
-	 * screen. Use width and height as the screen sizes.
+	 * screen. 
 	 */
 
 	// Set the model matrix to an identity matrix. 

@@ -21,8 +21,7 @@ private:
 	GLuint vao, vbo;
 	GLfloat pointSize;
 public:
-	PointCloud(std::string objFilename, float width, float height, 
-		GLfloat pointSize);
+	PointCloud(std::string objFilename, GLfloat pointSize);
 	~PointCloud();
 
 	void draw();
