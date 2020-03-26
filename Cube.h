@@ -1,32 +1,24 @@
 #ifndef _CUBE_H_
 #define _CUBE_H_
 
-#ifdef __APPLE__
-#include <OpenGL/gl3.h>
-#else
-#include <GL/glew.h>
-#endif
-
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <vector>
-
 #include "Object.h"
+
+#include <vector>
 
 class Cube : public Object
 {
 private:
-	GLuint vao;
-	GLuint vbos[2];
+	GLuint VAO;
+	GLuint VBO, EBO;
+
 public:
 	Cube(float size);
 	~Cube();
 
-	void draw();
+	void draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader);
 	void update();
 
 	void spin(float deg);
 };
 
 #endif
-

@@ -10,20 +10,25 @@ void setup_callbacks(GLFWwindow* window)
 {
 	// Set the error callback.
 	glfwSetErrorCallback(error_callback);
-	// Set the key callback.
-	glfwSetKeyCallback(window, Window::keyCallback);
+	
 	// Set the window resize callback.
 	glfwSetWindowSizeCallback(window, Window::resizeCallback);
+
+	// Set the key callback.
+	glfwSetKeyCallback(window, Window::keyCallback);
 }
 
 void setup_opengl_settings()
 {
 	// Enable depth buffering.
 	glEnable(GL_DEPTH_TEST);
+
 	// Related to shaders and z value comparisons for the depth buffer.
 	glDepthFunc(GL_LEQUAL);
+
 	// Set polygon drawing mode to fill front and back of each polygon.
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	// Set clear color to black.
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 }
@@ -42,36 +47,48 @@ void print_versions()
 #endif
 }
 
+
+
 int main(void)
 {
 	// Create the GLFW window.
 	GLFWwindow* window = Window::createWindow(640, 480);
-	if (!window) exit(EXIT_FAILURE);
+	if (!window) 
+		exit(EXIT_FAILURE);
 
 	// Print OpenGL and GLSL versions.
 	print_versions();
+
 	// Setup callbacks.
 	setup_callbacks(window);
+
 	// Setup OpenGL settings.
 	setup_opengl_settings();
+
 	// Initialize the shader program; exit if initialization fails.
-	if (!Window::initializeProgram()) exit(EXIT_FAILURE);
+	if (!Window::initializeProgram()) 
+		exit(EXIT_FAILURE);
+
 	// Initialize objects/pointers for rendering; exit if initialization fails.
-	if (!Window::initializeObjects()) exit(EXIT_FAILURE);
+	if (!Window::initializeObjects()) 
+		exit(EXIT_FAILURE);
 	
 	// Loop while GLFW window should stay open.
 	while (!glfwWindowShouldClose(window))
 	{
-		// Main render display callback. Rendering of objects is done here.
+		// Main render display callback. Rendering of objects is done here. (Draw)
 		Window::displayCallback(window);
 
-		// Idle callback. Updating objects, etc. can be done here.
+		// Idle callback. Updating objects, etc. can be done here. (Update)
 		Window::idleCallback();
 	}
 
+	// destroy objects created
 	Window::cleanUp();
+
 	// Destroy the window.
 	glfwDestroyWindow(window);
+
 	// Terminate GLFW.
 	glfwTerminate();
 

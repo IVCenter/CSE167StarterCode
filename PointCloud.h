@@ -1,30 +1,26 @@
 #ifndef _POINT_CLOUD_H_
 #define _POINT_CLOUD_H_
 
-#ifdef __APPLE__
-#include <OpenGL/gl3.h>
-#else
-#include <GL/glew.h>
-#endif
+#include "Object.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
 #include <vector>
 #include <string>
 
-#include "Object.h"
+using namespace std;
 
 class PointCloud : public Object
 {
 private:
 	std::vector<glm::vec3> points;
-	GLuint vao, vbo;
+
+	GLuint VAO, VBO;
 	GLfloat pointSize;
+
 public:
 	PointCloud(std::string objFilename, GLfloat pointSize);
 	~PointCloud();
-
-	void draw();
+	
+	void draw(const glm::mat4& view, const glm::mat4& projection, GLuint shader);
 	void update();
 
 	void updatePointSize(GLfloat size);
@@ -32,4 +28,3 @@ public:
 };
 
 #endif
-

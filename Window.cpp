@@ -1,51 +1,41 @@
 #include "Window.h"
 
+
+// Window Properties
 int Window::width;
 int Window::height;
-
 const char* Window::windowTitle = "GLFW Starter Project";
 
-// Objects to display.
+// Objects to Render
 Cube * Window::cube;
 PointCloud * Window::cubePoints;
+Object* currObj;
 
-// The object currently displaying.
-Object * Window::currentObj; 
+// Camera Matrices 
+// Projection matrix:
+glm::mat4 Window::projection; 
 
-glm::mat4 Window::projection; // Projection matrix.
+// View Matrix:
+glm::vec3 Window::eyePos(0, 0, 20);			// Camera position.
+glm::vec3 Window::lookAtPoint(0, 0, 0);		// The point we are looking at.
+glm::vec3 Window::upVector(0, 1, 0);		// The up direction of the camera.
+glm::mat4 Window::view = glm::lookAt(Window::eyePos, Window::lookAtPoint, Window::upVector);
 
-glm::vec3 Window::eye(0, 0, 20); // Camera position.
-glm::vec3 Window::center(0, 0, 0); // The point we are looking at.
-glm::vec3 Window::up(0, 1, 0); // The up direction of the camera.
+// Shader Program ID
+GLuint Window::shaderProgram; 
 
-// View matrix, defined by eye, center and up.
-glm::mat4 Window::view = glm::lookAt(Window::eye, Window::center, Window::up);
 
-GLuint Window::program; // The shader program id.
-
-GLuint Window::projectionLoc; // Location of projection in shader.
-GLuint Window::viewLoc; // Location of view in shader.
-GLuint Window::modelLoc; // Location of model in shader.
-GLuint Window::colorLoc; // Location of color in shader.
 
 bool Window::initializeProgram() {
 	// Create a shader program with a vertex shader and a fragment shader.
-	program = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+	shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
 
 	// Check the shader program.
-	if (!program)
+	if (!shaderProgram)
 	{
 		std::cerr << "Failed to initialize shader program" << std::endl;
 		return false;
 	}
-
-	// Activate the shader program.
-	glUseProgram(program);
-	// Get the locations of uniform variables.
-	projectionLoc = glGetUniformLocation(program, "projection");
-	viewLoc = glGetUniformLocation(program, "view");
-	modelLoc = glGetUniformLocation(program, "model");
-	colorLoc = glGetUniformLocation(program, "color");
 
 	return true;
 }
@@ -54,11 +44,12 @@ bool Window::initializeObjects()
 {
 	// Create a cube of size 5.
 	cube = new Cube(5.0f);
+
 	// Create a point cloud consisting of cube vertices.
 	cubePoints = new PointCloud("foo", 100);
 
 	// Set cube to be the first to display
-	currentObj = cube;
+	currObj = cube;
 
 	return true;
 }
@@ -70,7 +61,7 @@ void Window::cleanUp()
 	delete cubePoints;
 
 	// Delete the shader program.
-	glDeleteProgram(program);
+	glDeleteProgram(shaderProgram);
 }
 
 GLFWwindow* Window::createWindow(int width, int height)
@@ -144,33 +135,26 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 
 	// Set the projection matrix.
 	Window::projection = glm::perspective(glm::radians(60.0), 
-		double(width) / (double)height, 1.0, 1000.0);
+								double(width) / (double)height, 1.0, 1000.0);
 }
 
 void Window::idleCallback()
 {
-	// Perform any updates as necessary. 
-	currentObj->update();
+	// Perform any necessary updates here 
+	currObj->update();
 }
 
 void Window::displayCallback(GLFWwindow* window)
 {	
-	// Clear the color and depth buffers.
+	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-	// Specify the values of the uniform variables we are going to use.
-	glm::mat4 model = currentObj->getModel();
-	glm::vec3 color = currentObj->getColor();
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+	// Render the objects
+	currObj->draw(view, projection, shaderProgram);
 
-	// Render the object.
-	currentObj->draw();
-
-	// Gets events, including input such as keyboard and mouse or window resizing.
+	// Gets events, including input such as keyboard and mouse or window resizing
 	glfwPollEvents();
+
 	// Swap buffers.
 	glfwSwapBuffers(window);
 }
@@ -190,14 +174,15 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			// Close the window. This causes the program to also terminate.
 			glfwSetWindowShouldClose(window, GL_TRUE);				
 			break;
+
+		// switch between the cube and the cube pointCloud
 		case GLFW_KEY_1:
-			// Set currentObj to cube
-			currentObj = cube;
+			currObj = cube;
 			break;
 		case GLFW_KEY_2:
-			// Set currentObj to cubePoints
-			currentObj = cubePoints;
+			currObj = cubePoints;
 			break;
+
 		default:
 			break;
 		}
